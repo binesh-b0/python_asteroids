@@ -78,18 +78,13 @@ class ScoreSystem:
         try:
             if os.path.exists('high_scores.json'):
                 with open('high_scores.json', 'r') as f:
-                    return json.load(f)
+                    data = json.load(f)
+                    return data if data else []
         except Exception as e:
             print(f"Error loading high scores: {e}")
         
-        # Default high scores if file doesn't exist or has an error
-        return [
-            {"name": "AAA", "score": 10000, "date": "2025-01-01"},
-            {"name": "BBB", "score": 8000, "date": "2025-01-01"},
-            {"name": "CCC", "score": 6000, "date": "2025-01-01"},
-            {"name": "DDD", "score": 4000, "date": "2025-01-01"},
-            {"name": "EEE", "score": 2000, "date": "2025-01-01"}
-        ]
+        # Return empty list instead of default scores
+        return []
     
     def save_high_scores(self):
         """Save high scores to file"""
@@ -158,7 +153,7 @@ class ScoreSystem:
     
     def check_high_score(self):
         """Check if current score qualifies for high score table"""
-        return self.score > self.high_scores[-1]["score"]
+        return self.score > self.high_scores[-1]["score"] if self.high_scores else True
     
     def add_high_score(self, name):
         """Add current score to high score table"""
@@ -472,7 +467,9 @@ class GameStateManager:
                 if sound_manager:
                     sound_manager.play_sound('ufo_appear')
             elif option == MenuOption.QUIT:
-                return True  # Signal to quit game
+                pygame.quit()
+                sys.exit()
+                return True  
             
             return True
         
@@ -797,6 +794,65 @@ class GameStateManager:
             self.screen.blit(combo_text, (stats_x, stats_y + 75))
     
     def _draw_high_scores(self):
+        """Draw high score table"""
+        # Draw title
+        title = self.title_font.render("HIGH SCORES", True, (255, 215, 0))
+        title_x = (SCREEN_WIDTH - title.get_width()) // 2
+        title_y = 50
+        self.screen.blit(title, (title_x, title_y))
+        
+        # Check if there are no high scores
+        if not self.score_system.high_scores:
+            no_scores_text = self.menu_font.render("No scores recorded yet", True, (200, 200, 200))
+            text_x = (SCREEN_WIDTH - no_scores_text.get_width()) // 2
+            text_y = SCREEN_HEIGHT // 2 - no_scores_text.get_height() // 2
+            self.screen.blit(no_scores_text, (text_x, text_y))
+        else:
+            # Draw headers
+            header_y = 150
+            rank_header = self.menu_font.render("Rank", True, (255, 255, 255))
+            name_header = self.menu_font.render("Name", True, (255, 255, 255))
+            score_header = self.menu_font.render("Score", True, (255, 255, 255))
+            date_header = self.menu_font.render("Date", True, (255, 255, 255))
+            
+            self.screen.blit(rank_header, (SCREEN_WIDTH // 5 - rank_header.get_width() // 2, header_y))
+            self.screen.blit(name_header, (2 * SCREEN_WIDTH // 5 - name_header.get_width() // 2, header_y))
+            self.screen.blit(score_header, (3 * SCREEN_WIDTH // 5 - score_header.get_width() // 2, header_y))
+            self.screen.blit(date_header, (4 * SCREEN_WIDTH // 5 - date_header.get_width() // 2, header_y))
+            
+            # Draw horizontal line
+            pygame.draw.line(self.screen, (200, 200, 200), (SCREEN_WIDTH // 5 - 100, header_y + 40), (4 * SCREEN_WIDTH // 5 + 100, header_y + 40), 2)
+            
+            # Draw scores
+            score_y = header_y + 60
+            for i, score in enumerate(self.score_system.high_scores[:10]):
+                # Alternate row colors for readability
+                if i % 2 == 0:
+                    row_color = (200, 200, 200)
+                else:
+                    row_color = (170, 170, 170)
+                
+                # Highlight if current score
+                if self.score_system.score == score["score"] and not self.entering_name:
+                    row_color = (255, 255, 0)
+                
+                rank_text = self.font.render(f"{i+1}", True, row_color)
+                name_text = self.font.render(score["name"], True, row_color)
+                score_text = self.font.render(f"{score['score']}", True, row_color)
+                date_text = self.font.render(score["date"], True, row_color)
+                
+                self.screen.blit(rank_text, (SCREEN_WIDTH // 5 - rank_text.get_width() // 2, score_y))
+                self.screen.blit(name_text, (2 * SCREEN_WIDTH // 5 - name_text.get_width() // 2, score_y))
+                self.screen.blit(score_text, (3 * SCREEN_WIDTH // 5 - score_text.get_width() // 2, score_y))
+                self.screen.blit(date_text, (4 * SCREEN_WIDTH // 5 - date_text.get_width() // 2, score_y))
+                
+                score_y += 35
+        
+        # Draw instructions
+        instructions = self.font.render("Press ESC or ENTER to return to menu", True, (150, 150, 150))
+        instructions_x = (SCREEN_WIDTH - instructions.get_width()) // 2
+        instructions_y = SCREEN_HEIGHT - 50
+        self.screen.blit(instructions, (instructions_x, instructions_y))
         """Draw high score table"""
         # Draw title
         title = self.title_font.render("HIGH SCORES", True, (255, 215, 0))

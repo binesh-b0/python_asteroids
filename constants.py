@@ -1,10 +1,10 @@
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 
-ASTEROID_MIN_RADIUS = 20
+ASTEROID_MIN_RADIUS = 18
 ASTEROID_KINDS = 3
 ASTEROID_SPAWN_RATE = 0.8
-ASTEROID_MAX_RADIUS = ASTEROID_MIN_RADIUS * ASTEROID_KINDS
+ASTEROID_MAX_RADIUS = ASTEROID_MIN_RADIUS * ASTEROID_KINDS * .60
 PLAYER_RADIUS = 20
 PLAYER_TURN_SPEED = 300
 PLAYER_SPEED = 200
@@ -40,7 +40,7 @@ ASTEROID_TYPE_EXPLOSIVE = 1
 ASTEROID_TYPE_ARMORED = 2
 
 # Explosive asteroid constants
-EXPLOSIVE_PROJECTILE_COUNT = 8
+EXPLOSIVE_PROJECTILE_COUNT = 4
 EXPLOSIVE_PROJECTILE_SPEED = 200
 
 # Armored asteroid constants
@@ -84,10 +84,10 @@ DIFFICULTY_NAMES = {
 }
 
 # Ammo system constants
-AMMO_MAX_SHOTS = 25  # Maximum number of shots player can have
-AMMO_INITIAL = 10  # Starting ammo
-AMMO_RECHARGE_RATE = 1.0  # Seconds per ammo recharge
-AMMO_RECHARGE_AMOUNT = 1  # How many ammo points recharged at once
+AMMO_MAX_SHOTS = 80  # Maximum number of shots player can have
+AMMO_INITIAL = 25  # Starting ammo
+AMMO_RECHARGE_RATE = 2.0  # Seconds per ammo recharge
+AMMO_RECHARGE_AMOUNT = 3  # How many ammo points recharged at once
 
 # Power-up types
 POWERUP_AMMO = 0

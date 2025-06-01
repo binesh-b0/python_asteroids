@@ -72,6 +72,8 @@ def select_difficulty(screen, font):
         # Handle events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
                 return None  # Signal to exit the game
                 
             if event.type == pygame.KEYDOWN:
@@ -158,7 +160,24 @@ def main():
     pygame.init()
     pygame.font.init()
     font = pygame.font.SysFont(None, FONT_SIZE)
-    
+    # load and initialize background image
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # Ensure video mode is enabled before loading assets
+    try:
+        background_image = pygame.image.load("assets/images/Background/black.png").convert()
+
+    except pygame.error as e:
+        print(f"Error loading background image: {e}")
+        background_image = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+        background_image.fill((0, 0, 0))  # Fallback to a black background
+
+    # Create a larger surface to repeat the background image
+    repeated_background = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+    for x in range(0, SCREEN_WIDTH, background_image.get_width()):
+        for y in range(0, SCREEN_HEIGHT, background_image.get_height()):
+            repeated_background.blit(background_image, (x, y))
+
+
+
     # Setup screen and clock
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("Asteroids")
@@ -226,7 +245,7 @@ def main():
                     sound_manager.set_sfx_volume(sound_manager.sfx_volume - 0.1)
         
         # Clear screen
-        screen.fill((0, 0, 0))
+        screen.blit(repeated_background, (0, 0))
         
         # Update game state manager
         game_state_manager.update(dt)
@@ -370,32 +389,40 @@ def main():
             for item in drawable:
                 item.draw(screen)
                 
-            # Draw level manager HUD
-            next_y = level_manager.draw_hud(screen, 10, 10)
-            
-            # Draw score system HUD (combo, multiplier)
-            next_y = game_state_manager.score_system.draw_score(screen, 10, next_y + 10, font)
-            
-            # Display ammo
-            ammo_text = font.render(f"Ammo: {player.current_ammo}/{AMMO_MAX_SHOTS}", True, (255, 255, 255))
-            screen.blit(ammo_text, (10, next_y))
-            next_y += FONT_SIZE
-            
-            # Display lives
-            lives_text = font.render(f"Lives: {player.lives}", True, (255, 255, 255))
-            screen.blit(lives_text, (10, next_y))
-            
-            # Draw life icons
-            life_icon_spacing = 30
-            for i in range(player.lives):
-                # Draw a small ship icon for each life
-                icon_x = 100 + i * life_icon_spacing
-                icon_y = next_y
-                pygame.draw.polygon(screen, (255, 255, 255), [
-                    (icon_x, icon_y - 8),
-                    (icon_x - 5, icon_y + 4),
-                    (icon_x + 5, icon_y + 4)
-                ], 1)
+            # Create HUD instance if it doesn't exist
+            if 'hud' not in locals():
+                try:
+                    from hud import GameHUD
+                    hud = GameHUD(SCREEN_WIDTH, SCREEN_HEIGHT)
+                except ImportError:
+                    # Fall back to old HUD if GameHUD is not available
+                    next_y = level_manager.draw_hud(screen, 10, 10)
+                    next_y = game_state_manager.score_system.draw_score(screen, 10, next_y + 10, font)
+                    
+                    # Display ammo
+                    ammo_text = font.render(f"Ammo: {player.current_ammo}/{AMMO_MAX_SHOTS}", True, (255, 255, 255))
+                    screen.blit(ammo_text, (10, next_y))
+                    next_y += FONT_SIZE
+                    
+                    # Display lives
+                    lives_text = font.render(f"Lives: {player.lives}", True, (255, 255, 255))
+                    screen.blit(lives_text, (10, next_y))
+                    
+                    # Draw life icons
+                    life_icon_spacing = 30
+                    for i in range(player.lives):
+                        # Draw a small ship icon for each life
+                        icon_x = 100 + i * life_icon_spacing
+                        icon_y = next_y
+                        pygame.draw.polygon(screen, (255, 255, 255), [
+                            (icon_x, icon_y - 8),
+                            (icon_x - 5, icon_y + 4),
+                            (icon_x + 5, icon_y + 4)
+                        ], 1)
+            else:
+                # Update and draw the modern HUD
+                hud.update(dt, player, game_state_manager.score_system)
+                hud.draw(screen, player, game_state_manager.score_system)
             
             # Display respawn countdown if player is respawning
             if player.is_respawning:

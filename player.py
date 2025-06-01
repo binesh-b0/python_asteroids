@@ -31,6 +31,26 @@ class Player(CircleShape):
         self.respawn_timer = 0
         self.spawn_invulnerability_timer = 0
         self.initial_position = pygame.Vector2(x, y)  # Store initial position for respawning
+        
+        # Load player sprites
+        self.sprite_normal = pygame.image.load("assets/images/player.png").convert_alpha()
+        self.sprite_left = pygame.image.load("assets/images/playerLeft.png").convert_alpha()
+        self.sprite_right = pygame.image.load("assets/images/playerRight.png").convert_alpha()
+        self.sprite_damaged = pygame.image.load("assets/images/playerDamaged.png").convert_alpha()
+        self.shield_sprite = pygame.image.load("assets/images/shield.png").convert_alpha()
+        
+        # Scale sprites to match player radius
+        self.sprite_size = PLAYER_RADIUS * 2  # Diameter
+        self.sprite_normal = pygame.transform.scale(self.sprite_normal, (self.sprite_size, self.sprite_size))
+        self.sprite_left = pygame.transform.scale(self.sprite_left, (self.sprite_size, self.sprite_size))
+        self.sprite_right = pygame.transform.scale(self.sprite_right, (self.sprite_size, self.sprite_size))
+        self.sprite_damaged = pygame.transform.scale(self.sprite_damaged, (self.sprite_size, self.sprite_size))
+        self.shield_sprite = pygame.transform.scale(self.shield_sprite, (self.sprite_size * 1.5, self.sprite_size * 1.5))
+        
+        # Track turning state for sprite selection
+        self.turning_left = False
+        self.turning_right = False
+        self.current_sprite = self.sprite_normal
 
     def triangle(self):
         forward = pygame.Vector2(0, -1).rotate(self.rotation)
@@ -45,14 +65,36 @@ class Player(CircleShape):
         if self.is_respawning:
             return
             
-        # Base ship drawing
-        # If invincible (from power-up or spawn protection), make the ship flash
-        if (self.is_invincible or self.spawn_invulnerability_timer > 0) and int(pygame.time.get_ticks() / 100) % 2 == 0:
-            color = (0, 100, 255)  # Blue for invincibility
+        # Select appropriate sprite based on turning state
+        if self.turning_left:
+            current_sprite = self.sprite_left
+        elif self.turning_right:
+            current_sprite = self.sprite_right
         else:
-            color = "white"
+            current_sprite = self.sprite_normal
             
-        pygame.draw.polygon(screen, color=color, points=self.triangle(), width=2)
+        # Make the sprite flash blue when invincible
+        is_flashing = (self.is_invincible or self.spawn_invulnerability_timer > 0) and int(pygame.time.get_ticks() / 100) % 2 == 0
+        
+        # Rotate the sprite to match player rotation
+        rotated_sprite = pygame.transform.rotate(current_sprite, -self.rotation)  # Negative because pygame rotates clockwise
+        sprite_rect = rotated_sprite.get_rect(center=self.position)
+        
+        # Apply blue tint for invincibility if flashing
+        if is_flashing:
+            # Create a blue overlay on the sprite
+            blue_overlay = pygame.Surface(rotated_sprite.get_size(), pygame.SRCALPHA)
+            blue_overlay.fill((0, 100, 255, 128))  # Semi-transparent blue
+            rotated_sprite.blit(blue_overlay, (0, 0), special_flags=pygame.BLEND_RGBA_ADD)
+            
+        # Draw the player sprite
+        screen.blit(rotated_sprite, sprite_rect)
+        
+        # Draw shield sprite if invincible
+        if self.is_invincible or self.spawn_invulnerability_timer > 0:
+            rotated_shield = pygame.transform.rotate(self.shield_sprite, -self.rotation)
+            shield_rect = rotated_shield.get_rect(center=self.position)
+            screen.blit(rotated_shield, shield_rect)
         
         # Draw visual indicators for active power-ups
         if POWERUP_FIRE_RATE in self.active_powerups:
@@ -64,12 +106,6 @@ class Player(CircleShape):
                 x = self.position.x + radius * math.cos(angle)
                 y = self.position.y + radius * math.sin(angle)
                 pygame.draw.circle(screen, (255, 215, 0), (x, y), 3)
-                
-        if POWERUP_INVINCIBILITY in self.active_powerups:
-            # Draw shield effect - blue circle around the ship
-            pygame.draw.circle(screen, (0, 100, 255, 128), 
-                             [self.position.x, self.position.y], 
-                             self.radius * 1.3, 1)
 
     def rotate(self, dt, direction=1):
         """
@@ -110,9 +146,13 @@ class Player(CircleShape):
         # Update power-up durations
         self.update_powerups(dt)
 
-        if keys[pygame.K_a]:
+        # Update turning state for sprite selection
+        self.turning_left = keys[pygame.K_a]
+        self.turning_right = keys[pygame.K_d]
+        
+        if self.turning_left:
             self.rotate(dt, -1)  # Rotate counterclockwise (left)
-        if keys[pygame.K_d]:
+        if self.turning_right:
             self.rotate(dt, 1)  # Rotate clockwise (right)
         if keys[pygame.K_w]:
             self.move(dt)
@@ -147,9 +187,9 @@ class Player(CircleShape):
         shot = Shoot(self.position.x,self.position.y)
         shot.velocity = pygame.Vector2(0,-1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
         
-        # Play shooting sound - use phaser sound instead of regular shoot
+        # Play shooting sound 
         if sound_manager:
-            sound_manager.play_phaser_sound()
+            sound_manager.play_sound('shoot') if hasattr(sound_manager, 'play_sound') else None
 
     def add_score(self, points):
         """Add points to the player's score"""

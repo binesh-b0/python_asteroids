@@ -1,5 +1,5 @@
 import os
-import pygame
+import pygame # type: ignore
 from constants import SOUND_ENABLED, MUSIC_VOLUME, SFX_VOLUME
 
 class SoundManager:
@@ -35,12 +35,12 @@ class SoundManager:
     def _load_sounds(self):
         """Load all sound effects if available"""
         sound_files = {
-            'shoot': 'assets/sounds/shoot.wav',
+            'shoot': 'assets/sounds/sfx_laser1.ogg',
             'explosion_small': 'assets/sounds/explosion_small.wav',
             'explosion_medium': 'assets/sounds/explosion_medium.wav',
             'explosion_large': 'assets/sounds/explosion_large.wav',
-            'player_death': 'assets/sounds/player_death.wav',
-            'ufo_shoot': 'assets/sounds/ufo_shoot.wav',
+            'player_death': 'assets/sounds/sfx_lose.ogg',
+            'ufo_shoot': 'assets/sounds/laser2.ogg',
             'ufo_appear': 'assets/sounds/ufo_appear.wav',
             'big_explosion': 'assets/sounds/big_explosion.wav',
             'thrust': 'assets/sounds/thrust.wav',
