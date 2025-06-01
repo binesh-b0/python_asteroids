@@ -918,14 +918,15 @@ class GameStateManager:
             "",
             "",
             "GRAPHICS:",
-            "Created with Pygame",
+            "Kenney.nl| www.kenney.nl"
             "",
             "SOUND EFFECTS:",
             "Various sound libraries",
             "",
             "MUSIC:",
             "Music Unlimited from Pixabay"
-            "",        ]
+            "",
+                            ]
         
         credit_y = 130
         for line in credits:
