@@ -2,6 +2,8 @@
 
 A minimal implementation of the classic Asteroids game using Python.
 
+![Gameplay Demo](assets/asteroids.gif)
+
 ## Features
 - Simple gameplay mechanics.
 - Basic graphics and controls.
@@ -29,5 +31,5 @@ python main.py
 ## Credits
 This project is inspired by the classic Asteroids game and serves as a learning exercise in game development with Python.
  - Music by <a href="https://pixabay.com/users/music_unlimited-27600023/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=120280">Music Unlimited</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=120280">Pixabay</a>
- - Assets by [Kenney.nl] www.kenney.n
+ - Assets by [Kenney.nl] www.kenney.nl
 
