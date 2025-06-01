@@ -15,6 +15,8 @@ class Player(CircleShape):
     timer = 0
     def __init__(self, x, y):
         super().__init__(x,y,PLAYER_RADIUS)
+        self.health = PLAYER_MAX_HEALTH
+        self.regen = PLAYER_HEALTH_REGEN_RATE
         self.rotation = 0
         self.score = 0
         self.thrust_playing = False  # Track if thrust sound is currently playing
@@ -109,9 +111,9 @@ class Player(CircleShape):
         self.update_powerups(dt)
 
         if keys[pygame.K_a]:
-            self.rotate(dt, 1)  # Rotate counterclockwise (left)
+            self.rotate(dt, -1)  # Rotate counterclockwise (left)
         if keys[pygame.K_d]:
-            self.rotate(dt, -1)  # Rotate clockwise (right)
+            self.rotate(dt, 1)  # Rotate clockwise (right)
         if keys[pygame.K_w]:
             self.move(dt)
         if keys[pygame.K_s]:

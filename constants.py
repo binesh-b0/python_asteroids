@@ -8,6 +8,8 @@ ASTEROID_MAX_RADIUS = ASTEROID_MIN_RADIUS * ASTEROID_KINDS
 PLAYER_RADIUS = 20
 PLAYER_TURN_SPEED = 300
 PLAYER_SPEED = 200
+PLAYER_MAX_HEALTH = 100
+PLAYER_HEALTH_REGEN_RATE = 1.0
 
 PLAYER_SHOT_COUNTDOWN = 0.3
 SHOT_RADIUS = 5
@@ -82,7 +84,7 @@ DIFFICULTY_NAMES = {
 }
 
 # Ammo system constants
-AMMO_MAX_SHOTS = 15  # Maximum number of shots player can have
+AMMO_MAX_SHOTS = 25  # Maximum number of shots player can have
 AMMO_INITIAL = 10  # Starting ammo
 AMMO_RECHARGE_RATE = 1.0  # Seconds per ammo recharge
 AMMO_RECHARGE_AMOUNT = 1  # How many ammo points recharged at once

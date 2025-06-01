@@ -2,6 +2,7 @@ import pygame
 import json
 import os
 import time
+import sys
 from enum import Enum, auto
 from constants import *
 
@@ -506,8 +507,9 @@ class GameStateManager:
                 self.change_state(GameState.MENU)
                 if sound_manager:
                     sound_manager.play_sound('ufo_appear')
-                return {"back_to_menu": True}
             elif option == MenuOption.QUIT:
+                pygame.quit()
+                sys.exit()
                 return {"quit": True}  # Signal to quit game
             
             return True
@@ -914,8 +916,6 @@ class GameStateManager:
             "ASTEROIDS",
             "A Python Pygame Implementation",
             "",
-            "PROGRAMMING:",
-            "Your Name Here",
             "",
             "GRAPHICS:",
             "Created with Pygame",
@@ -923,11 +923,9 @@ class GameStateManager:
             "SOUND EFFECTS:",
             "Various sound libraries",
             "",
-            "SPECIAL THANKS:",
-            "The original Asteroids game by Atari",
-            "The Pygame community",
-            "And YOU for playing!"
-        ]
+            "MUSIC:",
+            "Music Unlimited from Pixabay"
+            "",        ]
         
         credit_y = 130
         for line in credits:
